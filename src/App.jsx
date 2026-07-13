@@ -1,16 +1,20 @@
 import React from 'react';
-import Editor from './Editor'
 import Header from './Header'
+import { Container, Row, Col} from 'react-bootstrap';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import ProblemSet from './Problemset';
+import P1 from './Problems/1';
+import Home from './Home';
 
 function App() {
-  return (
-  <div className='grid grid-rows-10 space-y-1'>
-    <Header/>
-    <div className='grid grid-cols-2 row-span-9'>
-      <div></div>
-      <Editor/>
-    </div>
-  </div>
+  return(
+  <BrowserRouter>
+      <Header/>
+        <Routes>
+          <Route path='/Problemset' element={<ProblemSet/>} />
+          <Route path='/Problems/1' element={<P1/>}/>
+         </Routes>
+    </BrowserRouter>
   );
 }
 
