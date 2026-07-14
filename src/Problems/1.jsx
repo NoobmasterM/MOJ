@@ -67,7 +67,7 @@ function P1(){
             <Col>
            <h5 style={{display:"inline"}}>Ratings:</h5><Difficulty rating={2400} fill={80} color="red"/><br></br><br></br>
            <h5 style={{display:"inline"}}>Tags: </h5><Badge pill bg="success">Basic</Badge><span> </span><Badge pill bg="danger">Segment Tree</Badge> <br></br><br></br>
-            <Accordion flush>
+            <Accordion flush alwaysOpen>
                 <Accordion.Item eventKey="0">
                     <Accordion.Header>Editorial</Accordion.Header>
                     <Accordion.Body>Bruh</Accordion.Body>
