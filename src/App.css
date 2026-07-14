@@ -1,0 +1,39 @@
+.difficulty {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+
+.difficulty-circle {
+    --fill: 0%;         
+    width: 18px;
+    height: 18px;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    background: linear-gradient(
+        to top,
+        currentColor var(--fill),
+        white var(--fill)
+    );
+    box-sizing: border-box;
+}
+
+.accordion-button {
+    background-color: purple !important;
+    color: white !important;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: purple !important;
+    color: white !important;
+    box-shadow: none;
+}
+
+.accordion-button::after {
+    filter: brightness(0) invert(1); 
+}
+
+:link{
+    text-decoration: none
+}
