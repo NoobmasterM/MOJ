@@ -101,63 +101,50 @@ function Ptemp(){
               <h5>Example</h5> 
 
               {problem.sample_tests?.map((test, index) => (
-  <div key={index} className="mb-4">
-    {/* Label for each separate test case block */}
-    <h6 className="text-muted">Example #{index + 1}</h6>
+              <div key={index} className="mb-4">
+   
+              <h6 className="text-muted">Example #{index + 1}</h6>
     
-    <Row>
-      {/* Input Block */}
-      <Col md={6}>
-        <Table bordered square style={{ marginBottom: 0 }}>
-          <thead>
-            <tr className="table-light">
-              <th style={{ padding: '6px 12px', fontSize: '14px' }}>Input</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              {/* whiteSpace: "pre-wrap" preserves line breaks (\n) from your data */}
-              <td style={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap', padding: '10px' }}>
-                {test.input}
-              </td>
-            </tr>
-          </tbody>
-        </Table>
-      </Col>
-
-      {/* Output Block */}
-      <Col md={6}>
-        <Table bordered square style={{ marginBottom: 0 }}>
-          <thead>
-            <tr className="table-light">
-              <th style={{ padding: '6px 12px', fontSize: '14px' }}>Output</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td style={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap', padding: '10px' }}>
-                {test.output}
-              </td>
-            </tr>
-          </tbody>
-        </Table>
-      </Col>
-    </Row>
-  </div>
-))}
-
-              {/*<Table striped bordered hover>
-               <thead><tr><th>Input</th></tr></thead>
+              <Row>
+      
+              <Col md={6}>
+              <Table bordered square style={{ marginBottom: 0 }}>
+              <thead>
+                <tr className="table-light">
+                <th style={{ padding: '6px 12px', fontSize: '14px' }}>Input</th>
+                </tr>
+              </thead>
               <tbody>
-                <tr><td>5<br></br> Hello</td></tr>
-               </tbody>
-            </Table>
-            <Table striped bordered hover>
-            <thead><tr><th>Output</th></tr></thead>
-             <tbody>
-            <tr><td>Hello</td></tr>
-            </tbody>
-           </Table>*/}
+                <tr>
+                <td style={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap', padding: '10px' }}>
+                {test.input}
+                </td>
+                </tr>
+              </tbody>
+              </Table>
+              </Col>
+
+     
+              <Col md={6}>
+              <Table bordered square style={{ marginBottom: 0 }}>
+              <thead>
+                <tr className="table-light">
+                <th style={{ padding: '6px 12px', fontSize: '14px' }}>Output</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                <td style={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap', padding: '10px' }}>
+                {test.output}
+                </td>
+                </tr>
+              </tbody>
+              </Table>
+              </Col>
+              </Row>
+              </div>
+              ))}
+              
            <h5>Notes</h5>
            <MathJaxContext>
             <MathJax>

@@ -38,12 +38,13 @@ function ProblemSet(){
                color = {problem.color}/></td>
 
           <td><Link to={`/Problems/${problem.id}`}> {problem.title} </Link></td>
-
+          <div style={{ display: 'flex', flexDirection: 'row', gap: '30px' }}>
           <td>{problem.tags?.map((tag) => (
             <span><Badge pill bg = {tag.bg}> {tag.name}
                   </Badge>
             </span>))}
             </td>
+          </div>
           <td> {problem.solved} </td>
         </tr>))}
         
