@@ -4,6 +4,19 @@ import { Table,Badge, Container} from "react-bootstrap";
 import Difficulty from "./Difficulty";
 import { Link } from "react-router-dom";
 
+const Problems = [
+  {id: 1, title: 'Hello World', rating: 2400, fill: 80, color: 'red', solved: 0,
+   tags: [{name: 'Basic', bg: 'success'}, 
+          {name: 'Segment Tree', bg: 'danger'}
+   ]
+  },
+  {id: 2, title: 'Array Max', rating: 3600, fill: 40, color: 'orange', solved: 0,
+   tags: [{name: 'Basic', bg: 'success'}, 
+          {name: 'Arrays', bg: 'success'}
+   ]
+  }
+  ];
+
 function ProblemSet(){
     return (
        <Container>
@@ -18,13 +31,22 @@ function ProblemSet(){
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>1</td>
-          <td><Difficulty rating={2400} fill={80} color="red"/></td>
-          <td><Link to='/Problems/1'>Hello World</Link></td>
-          <td><Badge pill bg="success">Basic</Badge><span> </span><Badge pill bg="danger">Segment Tree</Badge></td>
-          <td>0</td>
-        </tr>
+
+        {Problems?.map((problem) => (<tr key = {problem.id}>
+          <td>{problem.id}</td>
+          <td><Difficulty rating = {problem.rating} fill = {problem.fill} 
+               color = {problem.color}/></td>
+
+          <td><Link to={`/Problems/${problem.id}`}> {problem.title} </Link></td>
+
+          <td>{problem.tags?.map((tag) => (
+            <span><Badge pill bg = {tag.bg}> {tag.name}
+                  </Badge>
+            </span>))}
+            </td>
+          <td> {problem.solved} </td>
+        </tr>))}
+        
       </tbody>
         </Table>
         </Container>
