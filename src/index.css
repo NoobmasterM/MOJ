@@ -1,3 +1,194 @@
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
+
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+#root, main, section, .container, .row, .col, .container-fluid {
+  background-color: transparent !important;
+}
+
+:link {
+  text-decoration: none;
+}
+
+
+body.light-theme {
+  --main-light-bg: #f6f8fa;
+  --main-light-text-color: #24292e;
+  --main-light-heading-color: #0969da;
+  --main-light-problemset-header: #eaeef2;
+  --main-light-problemset-header-text: #24292e;
+  --main-light-navbar-bg: purple;
+
+  background-color: var(--main-light-bg) !important;
+  color: var(--main-light-text-color) !important;
+}
+
+body.light-theme h1, body.light-theme h2, body.light-theme h3, 
+body.light-theme h4, body.light-theme h5, body.light-theme h6 {
+  color: var(--main-light-heading-color) !important;
+}
+
+body.light-theme .table thead tr.table-light {
+  background-color: var(--main-light-problemset-header) !important;
+  color: var(--main-light-problemset-header-text) !important;
+}
+
+body.light-theme .badge {
+  font-family: monospace !important;
+  font-weight: bold !important;
+  letter-spacing: 0.5px;
+}
+
+body.light-theme .navbar {
+  background-color: var(--main-light-navbar-bg) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+body.light-theme .navbar-brand,
+body.light-theme .nav-link {
+  text-shadow: none !important;
+}
+
+
+body.dark-theme {
+  --main-dark-bg: #1e1e24;
+  --main-dark-text-color: #abb2bf;
+  --main-dark-heading-color: #e06c75;
+  --main-dark-muted-text: #5c6370;
+  --main-dark-problemset-links: #61afef;
+  --main-dark-problemset-links-hover: #ff007f;
+  
+  --bg-success: rgba(46, 117, 89, 0.25);
+  --text-success: #4ade80;
+  --border-success: rgba(74, 222, 128, 0.3);
+  --bg-danger: rgba(127, 29, 29, 0.35);
+  --text-danger: #f87171;
+  --border-danger: rgba(248, 113, 113, 0.3);
+
+  --nightclib-bg: #0b0f19;
+  --nightclub-border: #00f0ff;
+  --nightclub-shadow: rgba(0, 240, 255, 0.15);
+  --nightclub-brand: #00f0ff;
+  --nightclub-brand-shadow: #00f0ff;
+  --nightclub-nav: #ff007f;
+  --nightclub-nav-shadow: #ff007f;
+  --nightclub-nav-hover: #ffffff;
+
+  background-color: var(--main-dark-bg) !important;
+  color: var(--main-dark-text-color) !important;
+}
+
+body.dark-theme h1, body.dark-theme h2, body.dark-theme h3, 
+body.dark-theme h4, body.dark-theme h5, body.dark-theme h6 {
+  color: var(--main-dark-heading-color) !important;
+}
+
+body.dark-theme .text-muted {
+  color: var(--main-dark-muted-text) !important;
+}
+
+body.dark-theme a, 
+body.dark-theme .table a {
+  color: var(--main-dark-problemset-links) !important;
+  font-weight: 600;
+  transition: color 0.15s ease-in-out;
+}
+
+body.dark-theme a:hover, 
+body.dark-theme .table a:hover {
+  color: var(--main-dark-problemset-links-hover) !important;
+  text-shadow: 0 0 8px rgba(255, 0, 127, 0.4);
+}
+
+body.dark-theme .badge {
+  border: 1px solid transparent !important;
+  font-family: monospace !important;
+}
+
+body.dark-theme .bg-success {
+  background-color: var(--bg-success) !important; 
+  color: var(--text-success) !important;
+  border-color: var(--border-success) !important;
+  text-shadow: none !important;
+}
+
+body.dark-theme .bg-danger {
+  background-color: var(--bg-danger) !important; 
+  color: var(--text-danger) !important;
+  border-color: var(--border-danger) !important;
+  text-shadow: none !important;
+}
+
+body.dark-theme .accordion-item {
+  background-color: #21252b !important;
+  color: #abb2bf !important;
+  border-color: #3e4451 !important;
+}
+
+
+body.dark-theme .navbar {
+  background-color: var(--nightclib-bg) !important;
+  border-bottom: 2px solid var(--nightclub-border) !important;
+  box-shadow: 0 4px 20px var(--nightclub-shadow) !important;
+}
+
+body.dark-theme .navbar-brand {
+  color: var(--nightclub-brand) !important;
+  text-shadow: 0 0 5px var(--nightclub-brand-shadow), 0 0 12px rgba(0, 240, 255, 0.8) !important;
+}
+
+body.dark-theme .nav-link {
+  color: var(--nightclub-nav) !important;
+  font-family: 'Courier New', monospace;
+  font-weight: 900 !important;
+  letter-spacing: 1px;
+  text-shadow: 0 0 5px var(--nightclub-nav-shadow), 0 0 10px rgba(255, 0, 127, 0.5) !important;
+  transition: all 0.2s ease-in-out;
+}
+
+body.dark-theme .nav-link:hover {
+  color: var(--nightclub-nav-hover) !important;
+  text-shadow: 0 0 8px #ff007f, 0 0 20px #ff007f, 0 0 30px #ff007f !important;
+  transform: translateY(-1px);
+}
+
+
+body.dark-theme table,
+body.dark-theme .table,
+body.dark-theme .table tr,
+body.dark-theme .table th,
+body.dark-theme .table td,
+body.dark-theme .table tbody {
+  background-color: #21252b !important; 
+  border-color: #3e4451 !important;
+}
+
+body.dark-theme .table th,
+body.dark-theme .table td {
+  color: var(--main-dark-text-color) !important;
+}
+
+body.dark-theme .table thead tr,
+body.dark-theme .table thead th,
+body.dark-theme .table thead tr.table-light th {
+  background-color: #282c34 !important;
+  color: var(--main-dark-problemset-links) !important;
+  border-bottom: 2px solid #3e4451 !important;
+}
+
+body.dark-theme .table td div,
+body.dark-theme .table td span:not(.badge),
+body.dark-theme .table td ul,
+body.dark-theme .table td li {
+  background-color: transparent !important;
+}
