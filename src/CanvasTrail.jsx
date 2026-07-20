@@ -45,8 +45,8 @@ export default function CanvasTrail() {
         ctx.moveTo(p1.x, p1.y);
         ctx.lineTo(p2.x, p2.y);
 
-        ctx.lineWidth = ratio * 8;       
-        ctx.globalAlpha = ratio * 0.35;    
+        ctx.lineWidth = ratio * 12;       
+        ctx.globalAlpha = ratio * 0.70;    
         ctx.strokeStyle = baseColor;
         ctx.lineCap = 'round';           
         ctx.lineJoin = 'round';
