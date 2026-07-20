@@ -14,18 +14,17 @@ export default function MOJButton({ label, isActive, onClickAction }) {
               marginRight: '10px',
               border: '2px solid transparent',
               transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-              backgroundColor: isActive ? 'rgba(0, 204, 255, 0.15)' : 'rgba(255, 255, 255, 0.08)',
-              color: isActive ? '#00e5ff' : 'rgba(255, 255, 255, 0.65)',
-              borderColor: isActive ? '#00e5ff' : 'rgba(255, 255, 255, 0.2)',
-              boxShadow: isActive ? '0 0 10px rgba(0, 229, 255, 0.25)' : 'none',
+              
+              backgroundColor: isActive ? 'var(--btn-active-bg)' : 'var(--btn-inactive-bg)',
+              color: isActive ? 'var(--btn-active-text)' : 'var(--btn-inactive-text)',
+              borderColor: isActive ? 'var(--btn-active-border)' : 'var(--btn-inactive-border)',
+              boxShadow: isActive ? '0 0 10px rgba(250, 204, 21, 0.25)' : 'none',
           }}
           onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = isActive ? 'rgba(0, 204, 255, 0.3)' : 'rgba(255, 255, 255, 0.18)';
-              e.currentTarget.style.color = '#ffffff';
+              e.currentTarget.style.backgroundColor = isActive ? 'var(--btn-hover-active-bg)' : 'var(--btn-hover-inactive-bg)';
           }}
           onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = isActive ? 'rgba(0, 204, 255, 0.15)' : 'rgba(255, 255, 255, 0.08)';
-              e.currentTarget.style.color = isActive ? '#00e5ff' : 'rgba(255, 255, 255, 0.65)';
+              e.currentTarget.style.backgroundColor = isActive ? 'var(--btn-active-bg)' : 'var(--btn-inactive-bg)';
           }}
         >
             {label}

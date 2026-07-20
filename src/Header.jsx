@@ -25,7 +25,7 @@ function Header({ trailOn, setTrail, light, setLight }) {
           />
 
           <MOJButton
-            label={light ? " 🌙 " : " ☀️ "}
+            label={light ? " Dark " : " Light "}
             isActive={light}
             onClickAction={() => setLight(!light)}
           />

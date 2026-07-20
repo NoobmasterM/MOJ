@@ -27,10 +27,8 @@ export default function CanvasTrail() {
       const now = performance.now();
       const deltaTime = now - lastTimeRef.current;
 
-      // 🌟 THE UN-CRUSHABLE HARDWARE BRIDGE 🌟
-      // Instead of popping points out blindly on every single frame tick,
-      // we only pop a point out if a stable 16 milliseconds (60Hz equivalent speed) has passed!
-      // This stops high-refresh wall power from destroying your line array layers.
+      
+      
       if (deltaTime >= 16) {
         if (points.length > 0) {
           points.pop(); 
@@ -38,16 +36,16 @@ export default function CanvasTrail() {
         lastTimeRef.current = now; // Reset the clock tick
       }
 
-      // Safe cushion layout guard bounds
+      
       if (points.length < 4) {
         requestAnimationFrame(animate);
         return;
       }
 
       const isDarkActive = document.body.classList.contains('dark-theme');
-      const baseColor = isDarkActive ? 'coral' : 'limegreen'; 
+      const baseColor = isDarkActive ? 'coral' : 'chartreuse'; 
 
-      // Laser-Smooth Quadratic Bezier Curve Painter Engine
+
       for (let i = 0; i < points.length - 2; i++) {
         const p1 = points[i];
         const p2 = points[i + 1];
@@ -70,8 +68,10 @@ export default function CanvasTrail() {
         ctx.lineCap = 'round';           
         ctx.lineJoin = 'round';
 
-        ctx.shadowBlur = isDarkActive ? ratio * 14 : ratio * 3;
-        ctx.shadowColor = baseColor;
+         const shadowValue = isDarkActive ? baseColor : 'rgba(15, 23, 42, 0.2)';
+
+        ctx.shadowBlur = isDarkActive ? ratio * 14 : ratio * 8;
+        ctx.shadowColor = shadowValue;
 
         ctx.stroke();
       }
@@ -82,13 +82,13 @@ export default function CanvasTrail() {
     const animationId = requestAnimationFrame(animate); 
 
     const handleMove = (e) => {
-      // Your perfect drop-shadow perspective layout offsets!
+      
       const shadowX = e.clientX - 25;
       const shadowY = e.clientY + 30;
 
       pointsRef.current.unshift({ x: shadowX, y: shadowY });
 
-      // Cleanly manage trail length caps inside your input actions
+      
       const maxTrailLength = 28; 
       if (pointsRef.current.length > maxTrailLength) {
         pointsRef.current.pop(); 
