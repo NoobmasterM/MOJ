@@ -68,106 +68,117 @@ function Ptemp() {
   }
 
   return (
-    
     <MathJaxContext>
       <Container className="p-4">
         <Row>
           <Col>
-            <div className="text-center">
+            {/* PANEL 1: PROBLEM HEADER METRICS CARD */}
+            <div className="card text-center mb-4">
               <h3>{problem.title}</h3>
               <span>{`time limit per test: ${problem.time_limit} seconds`}</span> <br />
               <span>{`memory limit per test: ${problem.memory_limit} mb`}</span>
-              <hr />
             </div>
 
-            <MathJax>{problem.statement}</MathJax>
-            <br />
-            <h4>Input</h4>
-            <MathJax>{problem.input_Statement}</MathJax>
-            <br />
-            <h4>Output</h4>
-            <MathJax>{problem.output_Statement}</MathJax>
-            <br />
+            {/* PANEL 2: CORE STATEMENT SHEET */}
+            <div className="card mb-4">
+              <MathJax>{problem.statement}</MathJax>
+              <br />
+              <h4>Input</h4>
+              <MathJax>{problem.input_Statement}</MathJax>
+              <br />
+              <h4>Output</h4>
+              <MathJax>{problem.output_Statement}</MathJax>
+            </div>
             
-            <h5>Example</h5>
-            {problem.sample_tests?.map((test, index) => (
-              <div key={index} className="mb-4">
-                <h6 className="text-muted">Example #{index + 1}</h6>
-                <Row>
-                  <Col md={6}>
-                    <Table bordered square style={{ marginBottom: 0 }}>
-                      <thead>
-                        <tr className="table-light">
-                          <th style={{ padding: '6px 12px', fontSize: '14px' }}>Input</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td style={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap', padding: '10px' }}>
-                            {test.input}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </Table>
-                  </Col>
+            {/* PANEL 3: SAMPLE TESTS EXAMPLES CARD */}
+            <div className="card mb-4">
+              <h5>Example</h5>
+              {problem.sample_tests?.map((test, index) => (
+                <div key={index} className="mb-4">
+                  <h6 className="text-muted">Example #{index + 1}</h6>
+                  <Row>
+                    <Col md={6}>
+                      <Table bordered square style={{ marginBottom: 0 }}>
+                        <thead>
+                          <tr className="table-light">
+                            <th style={{ padding: '6px 12px', fontSize: '14px' }}>Input</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td style={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap', padding: '10px' }}>
+                              {test.input}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </Table>
+                    </Col>
 
-                  <Col md={6}>
-                    <Table bordered square style={{ marginBottom: 0 }}>
-                      <thead>
-                        <tr className="table-light">
-                          <th style={{ padding: '6px 12px', fontSize: '14px' }}>Output</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td style={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap', padding: '10px' }}>
-                            {test.output}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </Table>
-                  </Col>
-                </Row>
-              </div>
-            ))}
+                    <Col md={6}>
+                      <Table bordered square style={{ marginBottom: 0 }}>
+                        <thead>
+                          <tr className="table-light">
+                            <th style={{ padding: '6px 12px', fontSize: '14px' }}>Output</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td style={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap', padding: '10px' }}>
+                              {test.output}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </Table>
+                    </Col>
+                  </Row>
+                </div>
+              ))}
+            </div>
 
-            <h5>Notes</h5>
-            <MathJax>{problem.notes}</MathJax>
-            <br /><br />
+            {/* PANEL 4: TECHNICAL NOTES FOOTER */}
+            <div className="card mb-4">
+              <h5>Notes</h5>
+              <MathJax>{problem.notes}</MathJax>
+            </div>
           </Col>
         </Row>
 
         <Row>
           <Col>
-            <Editor /><br />
+            {/* PANEL 5: ACTIVE CODE RUNNER EDITOR PANEL */}
+            <div className="card mb-4">
+              <Editor />
+            </div>
           </Col>
         </Row>
 
         <Row>
           <Col>
-            <h5 style={{ display: "inline" }}>Ratings:</h5>
-            <Difficulty rating={problem.ratings.rating} fill={problem.ratings.fill} color={problem.ratings.color} />
-            <br /><br />
-            
-            <h5 style={{ display: "inline" }}>Tags: </h5>
-            {problem.tags?.map((tag, idx) => (
-             
-              <span key={idx} style={{ marginRight: '5px' }}>
-                <Badge pill bg={tag.bg}>{tag.name}</Badge>
-              </span>
-            ))}
-            <br /><br />
+            {/* PANEL 6: RATINGS, METRICS & META PANEL */}
+            <div className="card mb-4">
+              <h5 style={{ display: "inline" }}>Ratings:</h5>
+              <Difficulty rating={problem.ratings.rating} fill={problem.ratings.fill} color={problem.ratings.color} />
+              <br /><br />
+              
+              <h5 style={{ display: "inline" }}>Tags: </h5>
+              {problem.tags?.map((tag, idx) => (
+                <span key={idx} style={{ marginRight: '5px' }}>
+                  <Badge pill bg={tag.bg}>{tag.name}</Badge>
+                </span>
+              ))}
+              <br /><br />
 
-            <Accordion flush alwaysOpen>
-              <Accordion.Item eventKey="0">
-                <Accordion.Header>Editorial</Accordion.Header>
-                <Accordion.Body>Bruh</Accordion.Body>
-              </Accordion.Item>
-              <Accordion.Item eventKey="1">
-                <Accordion.Header>Discussion</Accordion.Header>
-                <Accordion.Body>No discussion yet</Accordion.Body>
-              </Accordion.Item>
-            </Accordion>
+              <Accordion flush alwaysOpen>
+                <Accordion.Item eventKey="0">
+                  <Accordion.Header>Editorial</Accordion.Header>
+                  <Accordion.Body>Bruh</Accordion.Body>
+                </Accordion.Item>
+                <Accordion.Item eventKey="1">
+                  <Accordion.Header>Discussion</Accordion.Header>
+                  <Accordion.Body>No discussion yet</Accordion.Body>
+                </Accordion.Item>
+              </Accordion>
+            </div>
           </Col>
         </Row>
       </Container>
