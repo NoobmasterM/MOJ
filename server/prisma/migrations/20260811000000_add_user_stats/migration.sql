@@ -1,0 +1,4 @@
+ALTER TABLE "users" ADD COLUMN "profilePic" TEXT;
+ALTER TABLE "users" ADD COLUMN "rating" INTEGER;
+ALTER TABLE "users" ADD COLUMN "solvedProblems" INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE "users" ADD COLUMN "contestsParticipated" INTEGER NOT NULL DEFAULT 0;

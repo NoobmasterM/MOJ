@@ -1,0 +1,69 @@
+.difficulty {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.difficulty-circle {
+    --fill: 0%;         
+    width: 18px;
+    height: 18px;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    background: linear-gradient(
+        to top,
+        currentColor var(--fill),
+        white var(--fill)
+    );
+    box-sizing: border-box;
+}
+
+.accordion-button {
+    background-color: purple !important;
+    color: white !important;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: purple !important;
+    color: white !important;
+    box-shadow: none;
+}
+
+.accordion-button::after {
+    filter: brightness(0) invert(1); 
+}
+
+:link{
+    text-decoration: none
+}
+
+.contest-link {
+    display: block;
+    color: inherit;
+}
+
+.contest-link:hover {
+    text-decoration: none;
+}
+
+.contest-row:hover {
+    background-color: rgba(128,0,128,0.04);
+}
+
+.profile-banner {
+    background: linear-gradient(135deg, rgba(102, 16, 242, 0.95), rgba(147, 51, 234, 0.9));
+    color: white;
+}
+
+.profile-avatar {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid rgba(255,255,255,0.7);
+}
+
+.profile-banner h2,
+.profile-banner .display-6 {
+    color: white;
+}
