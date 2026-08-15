@@ -1,0 +1,65 @@
+===============================================================================
+         SYSTEM ARCHITECTURE SUMMARY: EXPRESS, PRISMA, & POSTGRESQL
+===============================================================================
+
+-------------------------------------------------------------------------------
+1. WHAT WE ACCOMPLISHED TODAY
+-------------------------------------------------------------------------------
+* Fixed initial Frontend dependency errors using '--legacy-peer-deps'.
+* Fully cross-examined and documented all 15 core client-side views.
+* Provisioned an empty database container named 'MOJ' inside local pgAdmin.
+* Installed Node packages for the server environment and compiled the native 
+  query engine binaries locally using 'npx prisma generate'.
+* Replayed 7 historical data migrations sequentially into local PostgreSQL.
+* Engineered a custom 'seed.js' driver-adapter script to override empty 
+  constructors, populating the database schemas with structured rows.
+* Synchronized and booted up dual servers (Backend Express and Frontend Vite) 
+  to establish end-to-end client-to-database communication loops.
+
+-------------------------------------------------------------------------------
+2. HOW THE BACKEND FRAMEWORK OPERATES (FILE TREE MECHANICAL BREAKDOWN)
+-------------------------------------------------------------------------------
+When an action occurs on the website, data coordinates through your backend 
+directory tree via a structured, sequential lifecycle:
+
+* Root Level Core Configuration:
+  - '.env': Stores your local pgAdmin database password strings securely.
+  - 'server.js': The web application orchestrator. It loads your environment variables, 
+    opens up web socket cross-origin ports, and listens for client network requests.
+
+* Database Abstraction Layer (Prisma Folder):
+  - 'prisma/schema.prisma': The absolute data truth document. Defines the structure, 
+    data types, and foreign key relations for your tables.
+  - 'prisma.config.js': Leveraged by Prisma 7 to intercept and feed the raw 
+    DATABASE_URL connection string securely directly into the query execution engine.
+
+* Interception & Gatekeeping (middleware/):
+  - 'middleware/auth.js': The platform bouncer. When a user requests a private action 
+    (like entering a contest), this interceptor decodes cookies or JWT header 
+    tokens to ensure they are logged in before letting the request hit the database.
+
+* Request Processing Chambers (routes/):
+  - These JavaScript modules host your API endpoints (e.g., GET /api/problems).
+  - Instead of writing raw SQL strings, they use Prisma commands like:
+    'prisma.problemset.findMany()'
+  - Prisma automatically translates those commands into optimized PostgreSQL 
+    queries, grabs the rows, and passes them back to your routes to send to the UI.
+
+* The Algorithmic Execution Core (utils/):
+  - 'utils/codeExecutor.js': The core logic of the Online Judge. When a user writes 
+    code in Monaco and clicks submit, 'routes/execute.js' pipes the raw script string 
+    down into this helper utility.
+  - It spins up a short-lived local execution instance, pipes in the hidden 
+    'testCases' input strings from pgAdmin, catches console outputs, and returns 
+    a verdict ('ACCEPTED' or 'WRONG_ANSWER') to save in the submissions table.
+
+-------------------------------------------------------------------------------
+3. COMPONENT DATA FLOW MAP
+-------------------------------------------------------------------------------
+[React View] ➔ Calls src/api/client.js ➔ [Express Server via server.js]
+                                                   │
+                                             (Checks Auth)
+                                                   │
+                                                   ▼
+[PostgreSQL Table] ◄── Translates Query ◄── [routes/ file calls Prisma]
+===============================================================================

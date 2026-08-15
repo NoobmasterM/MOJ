@@ -1,0 +1,128 @@
+===============================================================================
+              COMPONENT ANALYSIS: HEADER.JSX NAVIGATION BAR
+===============================================================================
+
+-------------------------------------------------------------------------------
+1. DESIGN & STRUCUTURAL BREAKDOWN
+-------------------------------------------------------------------------------
+The Header component acts as your application's global navigation bar. It is 
+rendered outside the <Routes> block in App.jsx, meaning it stays fixed at the top 
+of the screen while the user switches between different project pages.
+
+* Global Navigation Pattern:
+  - Uses structural navigation menus to bind layout paths to user actions.
+  - Dynamically switches options if a user profile session variable is detected.
+
+-------------------------------------------------------------------------------
+2. COMPONENT FUNCTIONAL FLOWCHART
+-------------------------------------------------------------------------------
+This diagram charts how Header sets up the app navigation shell:
+
+   [HEADER RENDERS ON APPLOAD]
+               │
+               ▼
+   [EVALUATE ACTIVE USER ROUTE STATE]
+               │
+      ┌────────┴────────────────────────┐
+      ▼ (Left / Center Grid Block)      ▼ (Right Grid Block)
+[APPLICATION NAV BRANDING]       [USER ACTION ZONE]
+  │  • Displays Main Platform Logo  │  • Scans session context tokens.
+  │  • Maps link path to '/'        │  • If logged out: Shows "Login".
+  └──► Mounts Nav Links:            └──► If logged in: Displays username 
+       - /Problemset                     and routes user to "/profile".
+       - /contests
+       - /blogs
+===============================================================================
+
+-------------------------------------------------------------------------------
+2. STANDARD REACT/JSX FILE SKELETON (FOUNDATIONAL BUILDING RULES)
+-------------------------------------------------------------------------------
+Every standard React functional component file must follow this structural layout:
+
+// --- SECTION A: IMPORTS ---
+import React from 'react';                   // React library base engine
+import MyComponentStyle from './Styles.css'; // Optional local styles
+import ChildComponent from './Child';        // Sub-elements used in layout
+
+// --- SECTION B: FUNCTION COMPONENT DEFINITION ---
+function MyComponent() {
+  // 1. JavaScript logic, Local State variables, and Hooks live here
+  // 2. Data calculation/manipulation triggers before rendering
+
+  // 3. The Return Statement (Must return exactly ONE top-level parent wrapper)
+  return (
+    <div className="component-wrapper">
+      <h1>Title Element</h1>
+      <ChildComponent />
+    </div>
+  );
+}
+
+// --- SECTION C: EXPORT STATEMENT ---
+export default MyComponent; // Exposes file for application-wide imports
+===============================================================================
+
+
+===============================================================================
+                  CSS SYNTAX & REACT COMPONENT INTEGRATION
+===============================================================================
+
+-------------------------------------------------------------------------------
+1. CSS BASE SYNTAX RULES
+-------------------------------------------------------------------------------
+CSS links styles to HTML elements via targeting declarations called "Selectors".
+
+* Selector Structural Layout:
+  selector {
+    property: value;
+    another-property: value;
+  }
+
+* Core Selectors to know:
+  1. Class Selector (Targets a reusable class name. Denoted with a period '.'):
+     .submit-button {
+       background-color: #2563eb;
+       color: white;
+     }
+
+  2. ID Selector (Targets one completely unique element. Denoted with '#'):
+     #global-header {
+       position: sticky;
+       top: 0;
+     }
+
+  3. HTML Element Selector (Targets all native HTML tags globally):
+     body {
+       background-color: #0f172a;
+       font-family: sans-serif;
+     }
+
+-------------------------------------------------------------------------------
+2. INTEGRATING CSS STYLES INTO JSX COMPONENTS
+-------------------------------------------------------------------------------
+To use your stylesheets in React layout code, follow these three rules:
+
+* Rule A: Importing Styles
+  Directly import the raw stylesheet path at the very top of your JSX file:
+  import './App.css';
+
+* Rule B: The 'className' Substitution Attribute
+  Because 'class' is an immutable reserved keyword in vanilla JavaScript, you 
+  MUST use 'className' on all JSX markup blocks instead of traditional HTML 'class':
+  
+  <!-- Traditional HTML -->
+  <div class="card"></div>
+
+  {/* Correct React JSX */}
+  <div className="card"></div>
+
+* Rule C: Inline Styling Format Object
+  If you ever apply direct inline styling inside a JSX block, pass properties 
+  as an explicit JavaScript object using CamelCase instead of hyphens:
+
+  {/* Incorrect Syntax */}
+  <div style="background-color: red;"></div>
+
+  {/* Correct Syntax: Uses outer evaluation brackets {} and inner Object brackets {} */}
+  <div style={{ backgroundColor: 'red', marginTop: '10px' }}></div>
+===============================================================================

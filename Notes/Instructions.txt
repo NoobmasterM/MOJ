@@ -1,0 +1,34 @@
+===============================================================================
+               TEAM WORKSPACE CO-ORDINATION & SYNC PROTOCOL
+===============================================================================
+
+To get this Online Judge platform working on your local machine with an identical 
+database schema engine configuration, follow these exact 4 steps:
+
+STEP 1: INSTALL PACKAGE DEPENDENCIES
+* Open your terminal in the main root directory and type:
+  npm install --legacy-peer-deps
+* Change directory to the 'server' folder and type:
+  npm install
+
+STEP 2: PROVISION THE LOCAL ENVIRONMENT FILE (.ENV)
+* Look inside the 'server' directory. Create a new file named exactly '.env'
+* Paste your local PostgreSQL master superuser credentials inside it:
+  DATABASE_URL="postgresql://postgres:YOUR_PASSWORD@localhost:5432/MOJ?schema=public"
+  PORT=3000
+  NODE_ENV=development
+  FRONTEND_URL="http://localhost:5173"
+  SESSION_SECRET="replace-with-secure-session-secret"
+  JWT_SECRET="replace-with-secure-jwt-secret"
+
+STEP 3: MATERIALIZE LOCAL DATABASE SCHEMAS
+* Open your local pgAdmin desktop software tools.
+* Right-click the 'Databases' folder dropdown cluster and choose: Create -> Database...
+* Set the database title name to exactly: MOJ
+* Return to your code terminal sitting in 'server' and execute the migration:
+  npx prisma migrate dev
+
+STEP 4: BOOT UP PLATFORM SERVERS
+* Terminal A (Inside 'server' directory): npm run dev  (Turns on Express Engine)
+* Terminal B (Inside root directory):   npm run dev  (Turns on Vite Frontend)
+===============================================================================

@@ -1,0 +1,14 @@
+===============================================================================
+                    POSTGRESQL MASTER DATABASE SCHEMA
+===============================================================================
+* users: id (PK), email, username, password, role ("Role" enum), profilePic, 
+         rating, solvedProblems, contestsParticipated, ratingFill, ratingColor.
+* contests: id (PK), title, description, startTime, endTime, status.
+* problemsets: id (PK), title, description, difficulty, input, output, notes, 
+               testCases (JSON), constraints, examples (JSON), timeLimit, 
+               memoryLimit, tags (JSON), editorialRating, editorialFill, 
+               editorialColor, editorial, discussion, contest_id (FK).
+* submissions: id (PK), code, language, status, output, error, executionTime, 
+               userId (FK), problemsetId (FK), testsPassed, totalTests.
+* blogs: id (PK), title, content, author, tags (JSON), views.
+===============================================================================

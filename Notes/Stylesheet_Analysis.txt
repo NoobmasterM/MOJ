@@ -1,0 +1,46 @@
+===============================================================================
+              STYLESHEET BREAKDOWN: APP.CSS & INDEX.CSS ANALYSIS
+===============================================================================
+
+-------------------------------------------------------------------------------
+1. INDEX.CSS: THE TAILWIND CORE UTILITY LAYER
+-------------------------------------------------------------------------------
+Configured Tailwind CSS in the project. The '@import' lines 
+inject thousands of pre-built, utility-first classes directly into app.
+
+* @import "tailwindcss/base";
+  - Resets default browser styles (removes default margins, heading sizes, etc.) 
+    so layouts look identical across Chrome, Safari, and Edge.
+
+* @import "tailwindcss/components";
+  - Injects component wrapper styles managed by Tailwind framework modules.
+
+* @import "tailwindcss/utilities";
+  - Enacts thousands of atomic utility classes. This lets you style elements directly 
+    in your JSX files using utility props (e.g., className="pt-4 flex items-center").
+
+-------------------------------------------------------------------------------
+2. APP.CSS: CUSTOM DESIGN COMPONENT SPECIFICS
+-------------------------------------------------------------------------------
+This file contains specialized, custom UI elements unique to Competitive 
+Programming application. Here is what they are doing:
+
+* Custom Dynamic Variables (The CSS Variable Pattern):
+  - Rule: .difficulty-circle uses '--fill: 0%;'
+  - What it does: Creates a custom styling token. React can update this number 
+    on-the-fly via JSX to fill up problem difficulty meters visually.
+  - Linear Gradient Mapping: Fills the bubble upward based on the variable percent.
+
+* CSS !important Declarations (Overriding Bootstrap/UI Libraries):
+  - Rule: background-color: purple !important;
+  - What it does: Forcefully overrides any default framework rules. 
+    used this to forcefully turn accordion headers purple.
+
+* Pseudo-classes & Element Modifiers:
+  - :not(.collapsed) -> Targets open accordion components only.
+  - ::after          -> Manipulates sub-elements (like turning arrow icons white).
+  - :hover           -> Applies styles ONLY when the mouse pointer is over an element 
+                        (e.g., tinting a row purple when looking at contest tables).
+===============================================================================
+
+

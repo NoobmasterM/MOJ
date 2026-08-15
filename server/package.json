@@ -1,0 +1,28 @@
+{
+  "name": "moj-server",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "prisma:migrate": "prisma migrate dev --schema ./prisma/schema.prisma --config ./prisma/prisma.config.js",
+    "prisma:studio": "prisma studio --schema ./prisma/schema.prisma --config ./prisma/prisma.config.js",
+    
+    "prisma:reset": "prisma migrate reset --schema ./prisma/schema.prisma --config ./prisma/prisma.config.js"
+  },
+  "dependencies": {
+    "@prisma/client": "^7.9.1",
+    "@prisma/adapter-pg": "^7.9.1",
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "express-session": "^1.17.4",
+    "express-validator": "^7.2.1",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "prisma": "^7.9.1"
+  }
+}

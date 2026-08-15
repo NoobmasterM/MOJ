@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+model User {
+  id        Int     @id @default(autoincrement())
+  email     String  @unique
+  username  String  @unique
+  password  String
+  role      Role    @default(USER)
+  profilePic String?
+  rating     Int?
+  ratingFill Int? // Rating fill percentage (e.g., 80)
+  ratingColor String? // Rating color (e.g., "red")
+  solvedProblems Int @default(0)
+  contestsParticipated Int @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  submissions Submission[]
+  @@map("users")
+}
+
+model Problemset {
+  id        Int     @id @default(autoincrement())
+  title     String
+  description String
+  difficulty String // EASY, MEDIUM, HARD
+  input     String  // Input format description
+  output    String  // Output format description
+  notes     String  // Notes/explanation
+  testCases Json    // Array of {input, output, explanation}
+  constraints String
+  examples  Json    // Array of examples
+  timeLimit Int     // in seconds
+  memoryLimit Int   // in MB
+  tags      Json    // Array of tags
+  editorialRating Int? // Editorial rating (e.g., 2400)
+  editorialFill Int? // Rating fill percentage (e.g., 80)
+  editorialColor String? // Rating color (e.g., "red")
+  editorial String? // Editorial content
+  discussion String? // Discussion content
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  contestId Int? @map("contest_id")
+
+  submissions Submission[]
+  contest Contest? @relation(fields: [contestId], references: [id], onDelete: SetNull)
+  @@map("problemsets")
+}
+
+model Submission {
+  id        Int     @id @default(autoincrement())
+  code      String
+  language  String  // javascript, python, cpp, etc
+  status    String  // PENDING, ACCEPTED, FAILED
+  output    String?
+  error     String?
+  executionTime Int? // in ms
+  testsPassed Int? // Number of test cases passed
+  totalTests Int? // Total test cases
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId    Int
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  problemsetId Int
+  problemset   Problemset @relation(fields: [problemsetId], references: [id], onDelete: Cascade)
+
+  @@map("submissions")
+}
+
+model Contest {
+  id        Int     @id @default(autoincrement())
+  title     String
+  description String
+  startTime DateTime
+  endTime   DateTime
+  status    String  // UPCOMING, ONGOING, FINISHED
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  problemsets Problemset[]
+  @@map("contests")
+}
+
+model Blog {
+  id        Int     @id @default(autoincrement())
+  title     String
+  content   String
+  author    String
+  tags      Json    // Array of tags
+  views     Int @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("blogs")
+}

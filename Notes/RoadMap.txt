@@ -1,0 +1,24 @@
+===============================================================================
+              DEVELOPER PLAYGROUND: EXAMPLEAPIUSAGE.JSX ROLE
+===============================================================================
+
+-------------------------------------------------------------------------------
+1. CORE DATA FUNCTIONS
+-------------------------------------------------------------------------------
+This file provides functional blueprints for three core database actions:
+
+* Reading Data (The READ Operation):
+  - Triggers 'apiClient.getProblems()' inside a standard useEffect hook.
+  - Pulls the live rows from the PostgreSQL problems table.
+  - Updates local state memory to display them in a basic <ul> list.
+
+* Writing Data (The CREATE Operation):
+  - The 'handleCreateProblem' function intercepts a button click.
+  - Sends a mock JSON payload object ('New Problem', 'MEDIUM') to the server.
+  - Appends the returned database object directly to your screen array.
+
+* Submitting Code (The TRANSACTION Operation):
+  - The 'handleCreateSubmission' function simulates a code judge submission.
+  - Bundles a hardcoded code string snippet with a target programming language.
+  - Dispatches the payload to the server code executor engine.
+===============================================================================
