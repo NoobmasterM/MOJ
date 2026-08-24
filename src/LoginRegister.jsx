@@ -6,7 +6,6 @@ import { apiClient } from "./api/client";
 function LoginRegister() {
   const navigate = useNavigate();
 
-  //set objects for forms as the initial form
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [registerForm, setRegisterForm] = useState({ username: "", email: "", password: "", role: "USER" }); 
 
