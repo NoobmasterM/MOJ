@@ -1,15 +1,18 @@
 import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
+import { randomUUID } from 'crypto';
+import { query } from '../db.js';
 
-dotenv.config();
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET && process.env.NODE_ENV === 'production') throw new Error('JWT_SECRET is required in production');
+const secret = JWT_SECRET || 'development-only-secret-change-me';
+const SESSION_DAYS = 7;
 
-const JWT_SECRET = process.env.JWT_SECRET || 'dev-jwt-secret';
-const JWT_EXPIRES_IN = '7d';
+export async function createSession(userId) {
+  const id = randomUUID();
+  const expiresAt = new Date(Date.now() + SESSION_DAYS * 86400000);
+  await query('INSERT INTO auth_sessions (id, user_id, expires_at) VALUES ($1, $2, $3)', [id, userId, expiresAt]);
+  return jwt.sign({ sub: String(userId), sid: id }, secret, { expiresIn: `${SESSION_DAYS}d` });
+}
 
-export const signToken = (payload) => {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
-};
-
-export const verifyToken = (token) => {
-  return jwt.verify(token, JWT_SECRET);
-};
+export const verifyToken = (token) => jwt.verify(token, secret);
+export const revokeSession = (id) => query('UPDATE auth_sessions SET revoked_at = NOW() WHERE id = $1 AND revoked_at IS NULL', [id]);

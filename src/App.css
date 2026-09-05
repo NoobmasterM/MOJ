@@ -34,31 +34,17 @@
 }
 
 :link{
-    text-decoration: none;
+    text-decoration: none
 }
 
 .contest-link {
     display: block;
-    color: blue;
+    color: inherit;
 }
 
 .contest-link:hover {
-    text-decoration: underline purple;
-    color: red;
-
+    text-decoration: none;
 }
-
-.problemset-link {
-    display: block;
-    color: blue;
-}
-
-.problemset-link:hover {
-    text-decoration: underline purple;
-    color: red;
-
-}
-
 
 .contest-row:hover {
     background-color: rgba(128,0,128,0.04);
