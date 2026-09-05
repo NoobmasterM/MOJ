@@ -1,40 +1,31 @@
-import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
+import { query } from '../db.js';
+import { verifyToken } from '../routes/sessionAuth.js';
 
-dotenv.config();
+const tokenFrom = (req) => req.cookies?.token || (req.headers.authorization?.startsWith('Bearer ') ? req.headers.authorization.slice(7).trim() : null);
 
-const JWT_SECRET = process.env.JWT_SECRET || 'dev-jwt-secret';
-
-const getTokenFromRequest = (req) => {
-  if (req.cookies?.token) {
-    return req.cookies.token;
-  }
-  const authHeader = req.headers.authorization;
-  if (authHeader && authHeader.startsWith('Bearer ')) {
-    return authHeader.replace('Bearer ', '').trim();
-  }
-  return null;
-};
-
-export const authMiddleware = (req, res, next) => {
-  const token = getTokenFromRequest(req);
-  if (!token) {
-    return res.status(401).json({ error: 'Authorization token missing' });
-  }
-
+export const authMiddleware = async (req, res, next) => {
+  const token = tokenFrom(req);
+  if (!token) return res.status(401).json({ error: 'Authentication required' });
   try {
-    const payload = jwt.verify(token, JWT_SECRET);
-    req.userId = payload.userId;
-    req.userRole = payload.role;
+    const payload = verifyToken(token);
+    const { rows } = await query(
+      `SELECT u.id, u.role, s.id AS session_id FROM auth_sessions s
+       JOIN users u ON u.id = s.user_id
+       WHERE s.id = $1 AND s.user_id = $2 AND s.revoked_at IS NULL AND s.expires_at > NOW()`,
+      [payload.sid, Number(payload.sub)]
+    );
+    if (!rows[0]) return res.status(401).json({ error: 'Session is invalid or expired' });
+    req.userId = rows[0].id;
+    req.userRole = rows[0].role;
+    req.sessionId = rows[0].session_id;
     next();
-  } catch (error) {
-    res.status(401).json({ error: 'Invalid or expired token' });
+  } catch {
+    return res.status(401).json({ error: 'Invalid or expired session' });
   }
 };
 
-export const requireAdmin = (req, res, next) => {
-  if (req.userRole !== 'ADMIN') {
-    return res.status(403).json({ error: 'Admin role required' });
-  }
-  next();
-};
+export const requireAdmin = (req, res, next) => req.userRole === 'ADMIN' ? next() : res.status(403).json({ error: 'Admin role required' });
+
+export const requireProblemAuthor = (req, res, next) => ['ADMIN', 'AUTHOR'].includes(req.userRole)
+  ? next()
+  : res.status(403).json({ error: 'Author or admin role required' });

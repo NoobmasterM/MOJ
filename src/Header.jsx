@@ -19,16 +19,8 @@ function Header(){
         localStorage.setItem('mojUser', JSON.stringify(currentUser));
         setUser(currentUser);
       } catch {
-        const stored = localStorage.getItem('mojUser');
-        if (stored) {
-          try {
-            setUser(JSON.parse(stored));
-          } catch {
-            setUser(null);
-          }
-        } else {
-          setUser(null);
-        }
+        localStorage.removeItem('mojUser');
+        setUser(null);
       }
     };
 
@@ -40,16 +32,8 @@ function Header(){
         localStorage.setItem('mojUser', JSON.stringify(currentUser));
         setUser(currentUser);
       } catch {
-        const stored = localStorage.getItem('mojUser');
-        if (stored) {
-          try {
-            setUser(JSON.parse(stored));
-          } catch {
-            setUser(null);
-          }
-        } else {
-          setUser(null);
-        }
+        localStorage.removeItem('mojUser');
+        setUser(null);
       }
     };
 
@@ -83,6 +67,7 @@ function Header(){
              {user ? (
                <>
                  <Nav.Link as={Link} to="/profile">{user.username || `User ${user.id}`}</Nav.Link>
+                 {['ADMIN', 'AUTHOR'].includes(user.role) && <Nav.Link as={Link} to="/console">Console</Nav.Link>}
                  <Nav.Link onClick={logout}>Logout</Nav.Link>
                </>
              ) : (

@@ -1,10 +1,11 @@
 import express from 'express';
 import { executeCode } from '../utils/codeExecutor.js';
+import { authMiddleware } from '../middleware/auth.js';
 
 const router = express.Router();
 
 // POST execute code
-router.post('/', async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
   try {
     const { code, language = 'javascript', input = '' } = req.body;
 

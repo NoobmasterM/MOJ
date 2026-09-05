@@ -1,10 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import session from 'express-session';
 import dotenv from 'dotenv';
-import { PrismaClient } from '@prisma/client';
-import prismaConfig, { adapters } from './prisma/prisma.config.js';
+import { pool } from './db.js';
 
 dotenv.config();
 
@@ -19,7 +17,6 @@ import authRoutes from './routes/auth.js';
 dotenv.config();
 
 const app = express();
-const prisma = new PrismaClient({ adapter: adapters.pg });
 const PORT = process.env.PORT || 3000;
 
 app.use(cors({
@@ -28,16 +25,6 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(cookieParser());
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'dev-session-secret',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 24 * 60 * 60 * 1000
-  }
-}));
 
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
@@ -72,6 +59,6 @@ app.use((req, res) => {
 app.listen(PORT, () => {});
 
 process.on('SIGINT', async () => {
-  await prisma.$disconnect();
+  await pool.end();
   process.exit(0);
 });

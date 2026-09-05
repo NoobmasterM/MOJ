@@ -5,8 +5,8 @@ import { apiClient } from "./api/client";
 
 function LoginRegister() {
   const navigate = useNavigate();
-  const [loginForm, setLoginForm] = useState({ email: "", password: "" });
-  const [registerForm, setRegisterForm] = useState({ username: "", email: "", password: "", role: "USER" });
+  const [loginForm, setLoginForm] = useState({ identifier: "", password: "" });
+  const [registerForm, setRegisterForm] = useState({ username: "", email: "", password: "" });
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -61,8 +61,8 @@ function LoginRegister() {
                 <Tab eventKey="login" title="Login">
                   <Form onSubmit={handleLogin}>
                     <Form.Group className="mb-3">
-                      <Form.Label>Email</Form.Label>
-                      <Form.Control type="email" value={loginForm.email} onChange={(event) => setLoginForm({ ...loginForm, email: event.target.value })} required />
+                      <Form.Label>Email or Username</Form.Label>
+                      <Form.Control type="text" value={loginForm.identifier} onChange={(event) => setLoginForm({ ...loginForm, identifier: event.target.value })} required />
                     </Form.Group>
                     <Form.Group className="mb-3">
                       <Form.Label>Password</Form.Label>
@@ -84,13 +84,6 @@ function LoginRegister() {
                     <Form.Group className="mb-3">
                       <Form.Label>Password</Form.Label>
                       <Form.Control type="password" value={registerForm.password} onChange={(event) => setRegisterForm({ ...registerForm, password: event.target.value })} required />
-                    </Form.Group>
-                    <Form.Group className="mb-3">
-                      <Form.Label>Role</Form.Label>
-                      <Form.Select value={registerForm.role} onChange={(event) => setRegisterForm({ ...registerForm, role: event.target.value })}>
-                        <option value="USER">User</option>
-                        <option value="ADMIN">Admin</option>
-                      </Form.Select>
                     </Form.Group>
                     <Button type="submit" disabled={loading}>Register</Button>
                   </Form>

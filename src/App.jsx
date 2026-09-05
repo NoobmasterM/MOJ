@@ -9,6 +9,18 @@ import ContestDetail from './ContestDetail';
 import Blogs from './Blogs';
 import LoginRegister from './LoginRegister';
 import Profile from './Profile';
+import AdminDashboard from './AdminDashboard';
+import AuthorDashboard from './AuthorDashboard';
+import Console from './Console';
+import { Container, Alert } from 'react-bootstrap';
+
+function NotFound() {
+  return (
+    <Container className="p-4">
+      <Alert variant="danger">404 - Page not found.</Alert>
+    </Container>
+  );
+}
 
 function App() {
   return(
@@ -23,6 +35,10 @@ function App() {
           <Route path='/blogs' element={<Blogs/>}/>
           <Route path='/login' element={<LoginRegister/>}/>
           <Route path='/profile' element={<Profile/>}/>
+          <Route path='/admin' element={<AdminDashboard/>}/>
+          <Route path='/author' element={<AuthorDashboard/>}/>
+          <Route path='/console' element={<Console/>}/>
+          <Route path='*' element={<NotFound />} />
          </Routes>
     </BrowserRouter>
   );

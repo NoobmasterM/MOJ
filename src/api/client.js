@@ -3,9 +3,10 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 const handleResponse = async (response) => {
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
-    throw new Error(error.error || `API error: ${response.status}`);
+    const message = error.error || `API error: ${response.status}`;
+    throw new Error(`${response.status} ${message}`);
   }
-  return response.json();
+  return response.status === 204 ? null : response.json();
 };
 
 const fetchJson = (url, options = {}) => {
@@ -41,7 +42,7 @@ export const apiClient = {
 
   updateProblem: (id, data) =>
     fetchJson(`${API_URL}/problems/${id}`, {
-      method: 'PUT',
+      method: 'PATCH',
       body: JSON.stringify(data)
     }),
 
@@ -92,7 +93,7 @@ export const apiClient = {
 
   updateUser: (id, data) =>
     fetchJson(`${API_URL}/users/${id}`, {
-      method: 'PUT',
+      method: 'PATCH',
       body: JSON.stringify(data)
     }),
 

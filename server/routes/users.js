@@ -1,239 +1,65 @@
-import express from 'express';
-import { PrismaClient } from '@prisma/client';
-import prismaConfig, { adapters } from '../prisma/prisma.config.js';
-import dotenv from 'dotenv';
+﻿import express from 'express';
 import bcrypt from 'bcryptjs';
+import { query } from '../db.js';
 import { authMiddleware, requireAdmin } from '../middleware/auth.js';
 
-dotenv.config();
-
 const router = express.Router();
-const prisma = new PrismaClient({ adapter: adapters.pg });
+const validId = (id) => Number.isSafeInteger(Number(id)) && Number(id) > 0;
+const profileFields = 'id, email, username, role, "profilePic", rating, "ratingFill", "ratingColor", "solvedProblems", "contestsParticipated", "createdAt", "updatedAt"';
 
-// GET all users (admin)
-router.get('/', authMiddleware, requireAdmin, async (req, res) => {
+router.get('/', authMiddleware, requireAdmin, async (req, res, next) => {
   try {
-    const users = await prisma.user.findMany({
-      select: {
-        id: true,
-        username: true,
-        role: true,
-        email: true,
-        rating: true,
-        ratingFill: true,
-        ratingColor: true,
-        solvedProblems: true,
-        contestsParticipated: true,
-        createdAt: true,
-        _count: {
-          select: { submissions: true }
-        }
-      }
-    });
-
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+    const { rows } = await query(`SELECT ${profileFields} FROM users ORDER BY id`);
+    res.status(200).json(rows);
+  } catch (error) { next(error); }
 });
 
-// GET single user by ID
-router.get('/:id', authMiddleware, async (req, res) => {
+router.get('/:id', authMiddleware, async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const userId = parseInt(id, 10);
-
-    if (req.userId !== userId && req.userRole !== 'ADMIN') {
-      return res.status(403).json({ error: 'Access denied' });
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        username: true,
-        role: true,
-        email: true,
-        rating: true,
-        ratingFill: true,
-        ratingColor: true,
-        solvedProblems: true,
-        contestsParticipated: true,
-        createdAt: true,
-        submissions: {
-          select: {
-            id: true,
-            status: true,
-            createdAt: true,
-            problemset: {
-              select: { 
-                id: true, 
-                title: true, 
-                difficulty: true,
-                contest: {
-                  select: {
-                    id: true,
-                    title: true,
-                    description: true,
-                    startTime: true,
-                    endTime: true,
-                    status: true
-                  }
-                }
-              }
-            }
-          },
-          orderBy: { createdAt: 'desc' }
-        }
-      }
-    });
-
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    res.json(user);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+    if (!validId(req.params.id)) return res.status(400).json({ error: 'Invalid user id' });
+    const id = Number(req.params.id);
+    if (req.userId !== id && req.userRole !== 'ADMIN') return res.status(403).json({ error: 'You may only access your own profile' });
+    const { rows } = await query(`SELECT ${profileFields} FROM users WHERE id = $1`, [id]);
+    if (!rows[0]) return res.status(404).json({ error: 'User not found' });
+    res.status(200).json(rows[0]);
+  } catch (error) { next(error); }
 });
 
-// POST create new user (signup)
-router.post('/', async (req, res) => {
+router.patch('/:id', authMiddleware, async (req, res, next) => {
   try {
-    const { email, username, password, role, profilePic, rating, ratingFill, ratingColor, solvedProblems, contestsParticipated } = req.body;
+    if (!validId(req.params.id)) return res.status(400).json({ error: 'Invalid user id' });
+    const id = Number(req.params.id);
+    if (req.userId !== id && req.userRole !== 'ADMIN') return res.status(403).json({ error: 'You may only update your own profile' });
 
-    if (!email || !username || !password) {
-      return res.status(400).json({ error: 'Missing required fields' });
+    const existingUser = await query(`SELECT id, username, role FROM users WHERE id = $1`, [id]);
+    if (!existingUser.rows[0]) return res.status(404).json({ error: 'User not found' });
+    if (existingUser.rows[0].username === 'NoobmasterM' && req.body.role && req.body.role !== existingUser.rows[0].role) {
+      return res.status(403).json({ error: 'NoobmasterM role cannot be changed' });
     }
 
-    // Check if user already exists
-    const existingUser = await prisma.user.findFirst({
-      where: {
-        OR: [{ email }, { username }]
-      }
-    });
-
-    if (existingUser) {
-      return res.status(409).json({ error: 'Email or username already exists' });
-    }
-
-    // Hash the password
-    const hashed = await bcrypt.hash(password, 10);
-
-    const user = await prisma.user.create({
-      data: {
-        email,
-        username,
-        password: hashed,
-        role: role || 'USER',
-        ...(profilePic && { profilePic }),
-        ...(rating !== undefined && { rating: parseInt(rating) }),
-        ...(ratingFill !== undefined && { ratingFill: parseInt(ratingFill) }),
-        ...(ratingColor && { ratingColor }),
-        ...(solvedProblems !== undefined && { solvedProblems: parseInt(solvedProblems) }),
-        ...(contestsParticipated !== undefined && { contestsParticipated: parseInt(contestsParticipated) })
-      },
-      select: {
-        id: true,
-        email: true,
-        username: true,
-        role: true,
-        rating: true,
-        ratingFill: true,
-        ratingColor: true,
-        solvedProblems: true,
-        contestsParticipated: true,
-        createdAt: true,
-        updatedAt: true
-      }
-    });
-
-    res.status(201).json(user);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+    const allowed = ['username', 'profilePic'];
+    const values = [], assignments = [];
+    for (const field of allowed) if (typeof req.body[field] === 'string' && req.body[field].trim()) { values.push(req.body[field].trim()); assignments.push(`"${field}" = $${values.length}`); }
+    if (typeof req.body.password === 'string') { if (req.body.password.length < 8) return res.status(400).json({ error: 'Password must contain at least 8 characters' }); values.push(await bcrypt.hash(req.body.password, 12)); assignments.push(`password = $${values.length}`); }
+    if (req.userRole === 'ADMIN' && req.body.role && ['USER', 'AUTHOR', 'ADMIN'].includes(req.body.role)) { values.push(req.body.role); assignments.push(`role = $${values.length}::"Role"`); }
+    if (!assignments.length) return res.status(400).json({ error: 'No valid fields to update' });
+    values.push(id);
+    const { rows } = await query(`UPDATE users SET ${assignments.join(', ')}, "updatedAt" = NOW() WHERE id = $${values.length} RETURNING ${profileFields}`, values);
+    if (!rows[0]) return res.status(404).json({ error: 'User not found' });
+    res.status(200).json(rows[0]);
+  } catch (error) { if (error.code === '23505') return res.status(409).json({ error: 'Username already exists' }); next(error); }
 });
 
-// PUT update user
-router.put('/:id', authMiddleware, async (req, res) => {
+router.delete('/:id', authMiddleware, async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const { email, username, password, role, profilePic, rating, ratingFill, ratingColor, solvedProblems, contestsParticipated } = req.body;
-    const userId = parseInt(id, 10);
-
-    if (req.userId !== userId && req.userRole !== 'ADMIN') {
-      return res.status(403).json({ error: 'Access denied' });
-    }
-
-    const updateData = {
-      ...(email && { email }),
-      ...(username && { username }),
-      ...(profilePic && { profilePic }),
-      ...(rating !== undefined && { rating: parseInt(rating) }),
-      ...(ratingFill !== undefined && { ratingFill: parseInt(ratingFill) }),
-      ...(ratingColor && { ratingColor }),
-      ...(solvedProblems !== undefined && { solvedProblems: parseInt(solvedProblems) }),
-      ...(contestsParticipated !== undefined && { contestsParticipated: parseInt(contestsParticipated) })
-    };
-
-    if (role && req.userRole === 'ADMIN') {
-      updateData.role = role;
-    }
-
-    if (password) {
-      updateData.password = await bcrypt.hash(password, 10);
-    }
-
-    const user = await prisma.user.update({
-      where: { id: parseInt(id) },
-      data: updateData,
-      select: {
-        id: true,
-        email: true,
-        username: true,
-        role: true,
-        rating: true,
-        ratingFill: true,
-        ratingColor: true,
-        createdAt: true,
-        updatedAt: true
-      }
-    });
-
-    res.json(user);
-  } catch (error) {
-    if (error.code === 'P2025') {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    if (error.code === 'P2002') {
-      return res.status(409).json({ error: 'Email or username already exists' });
-    }
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// DELETE user
-router.delete('/:id', authMiddleware, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const userId = parseInt(id, 10);
-
-    if (req.userId !== userId && req.userRole !== 'ADMIN') {
-      return res.status(403).json({ error: 'Access denied' });
-    }
-
-    await prisma.user.delete({
-      where: { id: userId }
-    });
-
-    res.json({ message: 'User deleted successfully' });
-  } catch (error) {
-    if (error.code === 'P2025') {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    res.status(500).json({ error: error.message });
-  }
+    if (!validId(req.params.id)) return res.status(400).json({ error: 'Invalid user id' });
+    const id = Number(req.params.id);
+    if (req.userId !== id && req.userRole !== 'ADMIN') return res.status(403).json({ error: 'You may only delete your own profile' });
+    const result = await query('DELETE FROM users WHERE id = $1', [id]);
+    if (!result.rowCount) return res.status(404).json({ error: 'User not found' });
+    res.status(204).send();
+  } catch (error) { next(error); }
 });
 
 export default router;
+
