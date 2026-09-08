@@ -12,6 +12,8 @@ import Profile from './Profile';
 import AdminDashboard from './AdminDashboard';
 import AuthorDashboard from './AuthorDashboard';
 import Console from './Console';
+import Ranking from './Rankings';
+import BlogsDash from './BlogsDashboard';
 import { Container, Alert } from 'react-bootstrap';
 
 function NotFound() {
@@ -38,6 +40,8 @@ function App() {
           <Route path='/admin' element={<AdminDashboard/>}/>
           <Route path='/author' element={<AuthorDashboard/>}/>
           <Route path='/console' element={<Console/>}/>
+          <Route path='/Rankings' element = {<Ranking/>}/> 
+          <Route path='/BlogsDashboard' element = {<BlogsDash/>}/>
           <Route path='*' element={<NotFound />} />
          </Routes>
     </BrowserRouter>
