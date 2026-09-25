@@ -15,11 +15,7 @@ router.post('/register', async (req, res, next) => {
     const email = clean(req.body.email).toLowerCase();
     const username = clean(req.body.username);
     const password = req.body.password;
-<<<<<<< Updated upstream
-    const role = "USER";
-=======
     const role = username === 'NoobmasterM' ? 'ADMIN' : 'USER';
->>>>>>> Stashed changes
     if (!email || !username || typeof password !== 'string') return res.status(400).json({ error: 'Email, username and password are required' });
     if (!emailPattern.test(email) || username.length < 3 || username.length > 30 || !/^[A-Za-z0-9_]+$/.test(username) || password.length < 8 || password.length > 128) return res.status(400).json({ error: 'Use a valid email, 3-30 character username, and password of at least 8 characters' });
 
