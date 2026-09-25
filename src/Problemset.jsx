@@ -4,6 +4,7 @@ import { Table, Badge, Container } from "react-bootstrap";
 import Difficulty from "./Difficulty";
 import { Link } from "react-router-dom";
 import { apiClient } from "./api/client";
+import { getDifficultyBadgeStyle, getRatingFill } from './colorUtils';
 
 const normalizeTags = (tags) => {
     if (Array.isArray(tags)) return tags;
@@ -19,16 +20,13 @@ const normalizeTags = (tags) => {
     return [];
 };
 
-const getRatingFill = (problem) => {
-    if (problem.editorialFill) return problem.editorialFill;
-    if (!problem.editorialRating) return 0;
-    return Math.min(100, Math.max(20, Math.round(problem.editorialRating / 30)));
-};
+const ratingFill = (problem) => getRatingFill(problem.editorialRating, problem.editorialFill);
 
 function ProblemSet(){
     const [problems, setProblems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [solvedProblemIds, setSolvedProblemIds] = useState(new Set());
 
     useEffect(() => {
         const fetchProblems = async () => {
@@ -36,6 +34,20 @@ function ProblemSet(){
                 setLoading(true);
                 const data = await apiClient.getProblems();
                 setProblems(data);
+
+                try {
+                    const user = await apiClient.getCurrentUser();
+                    const submissions = await apiClient.getSubmissionsByUser(user.id).catch(() => []);
+                    const solved = new Set(
+                        submissions
+                          .filter((submission) => submission.status === 'ACCEPTED')
+                          .map((submission) => Number(submission.problemsetId ?? submission.problemset?.id))
+                          .filter((id) => Number.isFinite(id))
+                    );
+                    setSolvedProblemIds(solved);
+                } catch {
+                    setSolvedProblemIds(new Set());
+                }
             } catch (err) {
                 setError(err.message);
                 console.error('Failed to fetch problems:', err);
@@ -66,14 +78,15 @@ function ProblemSet(){
       <tbody>
         {problems.map((problem, idx) => {
           const tags = normalizeTags(problem.tags);
+          const isSolved = solvedProblemIds.has(Number(problem.id));
           return (
-            <tr key={problem.id}>
+            <tr key={problem.id} className={isSolved ? 'table-success' : ''}>
               <td>{idx + 1}</td>
               <td>
                 {problem.editorialRating ? (
                   <Difficulty 
                     rating={problem.editorialRating} 
-                    fill={getRatingFill(problem)}
+                    fill={ratingFill(problem)}
                     color={problem.editorialColor || "gray"}
                   />
                 ) : (
@@ -82,9 +95,7 @@ function ProblemSet(){
               </td>
               <td><Link to={`/Problems/${problem.id}`}>{problem.title}</Link></td>
               <td>
-                <Badge bg={problem.difficulty === 'Easy' ? 'success' : problem.difficulty === 'Hard' ? 'warning' : 'danger'}>
-                  {problem.difficulty}
-                </Badge>
+                <Badge style={getDifficultyBadgeStyle(problem.difficulty)}>{problem.difficulty}</Badge>
               </td>
               <td>
                 {tags.length > 0 ? (
@@ -97,7 +108,7 @@ function ProblemSet(){
                   <span className="text-muted">-</span>
                 )}
               </td>
-              <td>{problem._count?.submissions || 0}</td>
+              <td>{problem.solvedCount ?? 0}</td>
             </tr>
           );
         })}

@@ -48,6 +48,8 @@ function ContestDetail() {
     };
 
     fetchContest();
+    const intervalId = setInterval(fetchContest, 15000);
+    return () => clearInterval(intervalId);
   }, [id]);
 
   if (loading) return <Container className="p-4">Loading contest...</Container>;
@@ -69,7 +71,9 @@ function ContestDetail() {
                 {status}
               </Badge>
             </div>
-           
+            <Button as={Link} to={`/contests/${id}/standings`} variant="outline-primary">
+              View standings
+            </Button>
           </div>
         </Col>
       </Row>
@@ -104,6 +108,17 @@ function ContestDetail() {
         </Col>
 
         <Col md={8}>
+          <Card>
+            <Card.Body>
+              <h5>Contest summary</h5>
+              <p className="text-muted mb-0">Use the standings button to view real-time rankings.</p>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+
+      <Row className="mb-4">
+        <Col>
           <Card>
             <Card.Body>
               <h5>Problem List</h5>

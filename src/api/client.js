@@ -28,8 +28,8 @@ const fetchJson = (url, options = {}) => {
 };
 
 export const apiClient = {
-  getProblems: () =>
-    fetchJson(`${API_URL}/problems`),
+  getProblems: (includeArchived = false) =>
+    fetchJson(`${API_URL}/problems${includeArchived ? '?includeArchived=true' : ''}`),
 
   getProblem: (id) =>
     fetchJson(`${API_URL}/problems/${id}`),
@@ -53,7 +53,7 @@ export const apiClient = {
     fetchJson(`${API_URL}/submissions/user/${userId}`),
 
   getSubmissionsByProblem: (problemId) =>
-    fetchJson(`${API_URL}/submissions/problemset/${problemId}`),
+    fetchJson(`${API_URL}/submissions/problem/${problemId}`),
 
   getSubmission: (id) =>
     fetchJson(`${API_URL}/submissions/${id}`),
@@ -81,6 +81,9 @@ export const apiClient = {
 
   getUsers: () =>
     fetchJson(`${API_URL}/users`),
+
+  getRankings: () =>
+    fetchJson(`${API_URL}/users/rankings`),
 
   getUser: (id) =>
     fetchJson(`${API_URL}/users/${id}`),
@@ -121,8 +124,22 @@ export const apiClient = {
       body: JSON.stringify(data)
     }),
 
+  updateContest: (id, data) =>
+    fetchJson(`${API_URL}/contests/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data)
+    }),
+
+  deleteContest: (id) =>
+    fetchJson(`${API_URL}/contests/${id}`, { method: 'DELETE' }),
+
   getContest: (id) =>
     fetchJson(`${API_URL}/contests/${id}`),
+
+  applyContestRatings: (id) =>
+    fetchJson(`${API_URL}/contests/${id}/apply-ratings`, {
+      method: 'POST'
+    }),
 
   getBlogs: () =>
     fetchJson(`${API_URL}/blogs`),
@@ -130,10 +147,39 @@ export const apiClient = {
   getBlog: (id) =>
     fetchJson(`${API_URL}/blogs/${id}`),
 
+  voteOnBlog: (id, type) =>
+    fetchJson(`${API_URL}/blogs/${id}/vote`, {
+      method: 'POST',
+      body: JSON.stringify({ type })
+    }),
+
   createBlog: (data) =>
     fetchJson(`${API_URL}/blogs`, {
       method: 'POST',
       body: JSON.stringify(data)
+    }),
+
+  updateBlog: (id, data) =>
+    fetchJson(`${API_URL}/blogs/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data)
+    }),
+
+  deleteBlog: (id) =>
+    fetchJson(`${API_URL}/blogs/${id}`, { method: 'DELETE' }),
+
+  getNotifications: () =>
+    fetchJson(`${API_URL}/notifications`),
+
+  clearNotifications: () =>
+    fetchJson(`${API_URL}/notifications`, {
+      method: 'DELETE'
+    }),
+
+  createNotification: (message) =>
+    fetchJson(`${API_URL}/notifications`, {
+      method: 'POST',
+      body: JSON.stringify({ message })
     }),
 
   healthCheck: () =>

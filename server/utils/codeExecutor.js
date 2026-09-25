@@ -78,11 +78,15 @@ export async function executeCode(code, language = 'javascript', input = '') {
 
       try {
         const runCommand = langConfig.run(filename);
-        const { stdout, stderr } = await execPromise(runCommand, { 
+        // `exec` does not consume an `input` option. Write the editor input to
+        // the spawned process explicitly so programs using stdin can read it.
+        const execution = execPromise(runCommand, {
           timeout: langConfig.timeout,
           encoding: 'utf-8',
           shell: true
         });
+        execution.child.stdin.end(typeof input === 'string' ? input : String(input ?? ''));
+        const { stdout, stderr } = await execution;
 
         output = stdout.trim();
         if (stderr) {

@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
-import { pool } from './db.js';
+import { ensureSchema, pool } from './db.js';
 
 dotenv.config();
 
@@ -13,6 +13,8 @@ import executeRoutes from './routes/execute.js';
 import contestRoutes from './routes/contests.js';
 import blogRoutes from './routes/blogs.js';
 import authRoutes from './routes/auth.js';
+import notificationRoutes from './routes/notifications.js';
+import analyticsRoutes from './routes/analytics.js';
 
 dotenv.config();
 
@@ -38,6 +40,8 @@ app.use('/api/execute', executeRoutes);
 app.use('/api/contests', contestRoutes);
 app.use('/api/blogs', blogRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
@@ -55,8 +59,12 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
+const startServer = async () => {
+  await ensureSchema();
+  app.listen(PORT, () => {});
+};
 
-app.listen(PORT, () => {});
+startServer();
 
 process.on('SIGINT', async () => {
   await pool.end();

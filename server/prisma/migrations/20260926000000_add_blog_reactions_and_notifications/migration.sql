@@ -1,0 +1,11 @@
+ALTER TABLE "blogs" ADD COLUMN IF NOT EXISTS likes INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE "blogs" ADD COLUMN IF NOT EXISTS dislikes INTEGER NOT NULL DEFAULT 0;
+
+CREATE TABLE IF NOT EXISTS "notifications" (
+    "id" SERIAL PRIMARY KEY,
+    "message" TEXT NOT NULL,
+    "createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
+    "sender_id" INTEGER NOT NULL REFERENCES "users"("id") ON DELETE RESTRICT
+);
+
+CREATE INDEX IF NOT EXISTS "notifications_createdAt_idx" ON "notifications" ("createdAt" DESC);

@@ -3,44 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { apiClient } from './api/client';
 import { Container, Row, Col, Card, Button, Table, Badge, Nav } from 'react-bootstrap';
 import Difficulty from './Difficulty';
+import { getRatingColor, getRatingFill, getRatingLabel, getRatingBadgeStyle } from './colorUtils';
 
-const rankLabel = (rating) => {
-  if (rating >= 2400) return 'Grandmaster';
-  if (rating >= 2100) return 'Master';
-  if (rating >= 1900) return 'Candidate Master';
-  if (rating >= 1600) return 'Expert';
-  if (rating >= 1400) return 'Specialist';
-  if (rating >= 1200) return 'Pupil';
-  return 'Newbie';
-};
+const rankLabel = (rating) => getRatingLabel(rating);
 
-const rankVariant = (rating) => {
-  if (rating >= 2400) return 'danger';
-  if (rating >= 2100) return 'warning';
-  if (rating >= 1900) return 'info';
-  if (rating >= 1600) return 'primary';
-  if (rating >= 1400) return 'success';
-  return 'secondary';
-};
+const rankVariant = (rating, explicitColor = undefined) => getRatingBadgeStyle(rating, explicitColor);
 
-const getRatingColor = (rating) => {
-  if (rating >= 2400) return '#ff5e5e';
-  if (rating >= 2100) return '#ff9f1c';
-  if (rating >= 1900) return '#4f9dff';
-  if (rating >= 1600) return '#5a5fff';
-  if (rating >= 1400) return '#28a745';
-  if (rating >= 1200) return '#6f42c1';
-  return '#6c757d';
-};
-
-const getRatingFill = (user) => {
-  if (user.ratingFill) return user.ratingFill;
-  if (!user.rating) return 0;
-  return Math.min(100, Math.max(20, Math.round(user.rating / 30)));
-};
-
-const getBannerBackground = (rating) => {
-  const color = getRatingColor(rating);
+const getBannerBackground = (rating, explicitColor = undefined) => {
+  const color = explicitColor || getRatingColor(rating);
   return rating ? `linear-gradient(135deg, ${color}, rgba(0,0,0,0.25))` : 'linear-gradient(135deg, rgba(102, 16, 242, 0.95), rgba(147, 51, 234, 0.9))';
 };
 
@@ -83,12 +53,14 @@ export default function Profile(){
         setUser(currentUser);
         return currentUser;
       })
-      .then((currentUser) => {
+      .then(async (currentUser) => {
         if (!currentUser) throw new Error('User not found');
-        return apiClient.getUser(currentUser.id);
-      })
-      .then((profileData) => {
-        setProfile(profileData);
+        const profileData = await apiClient.getUser(currentUser.id);
+        const submissions = Array.isArray(profileData.submissions) && profileData.submissions.length > 0
+          ? profileData.submissions
+          : await apiClient.getSubmissionsByUser(currentUser.id);
+
+        setProfile({ ...profileData, submissions });
         setError(null);
       })
       .catch((err) => {
@@ -111,13 +83,15 @@ export default function Profile(){
   const joined = displayUser?.createdAt ? new Date(displayUser.createdAt).toLocaleDateString() : 'Unknown';
   const uniqueContests = getUniqueContests(profile?.submissions);
   const ratingColor = displayUser?.ratingColor || getRatingColor(rating);
-  const ratingFill = getRatingFill(displayUser);
+  const ratingFill = getRatingFill(rating, displayUser?.ratingFill);
+  const solvedCount = Number(displayUser?.solvedProblems ?? 0);
+  const contestCount = Number(displayUser?.contestsParticipated ?? uniqueContests.length ?? 0);
 
   return (
     <Container className="p-4">
       <Row>
         <Col md={12} className="mb-4">
-          <Card className="profile-banner p-4" style={{ background: getBannerBackground(rating) }}>
+          <Card className="profile-banner p-4" style={{ background: getBannerBackground(rating, ratingColor) }}>
             <Row className="align-items-center">
               <Col md={9}>
                 <div className="d-flex align-items-center gap-3">
@@ -125,7 +99,7 @@ export default function Profile(){
                   <div>
                     <h2 className="mb-1">{displayUser?.username || `User ${displayUser?.id}`}</h2>
                     <div className="d-flex align-items-center gap-2">
-                      <Badge pill bg={rankVariant(rating)}>{rankLabel(rating)}</Badge>
+                      <Badge pill style={rankVariant(rating, ratingColor)}>{rankLabel(rating)}</Badge>
                       <span className="text-muted">Member since {joined}</span>
                     </div>
                   </div>
@@ -154,8 +128,8 @@ export default function Profile(){
               </div>
               <hr />
               <div className="mb-2"><strong>Role:</strong> {displayUser?.role}</div>
-              <div className="mb-2"><strong>Solved:</strong> {displayUser?.solvedProblems ?? 0}</div>
-              <div className="mb-2"><strong>Contests:</strong> {uniqueContests.length}</div>
+              <div className="mb-2"><strong>Solved:</strong> {solvedCount}</div>
+              <div className="mb-2"><strong>Contests:</strong> {contestCount}</div>
               {displayUser?._count?.submissions !== undefined && (
                 <div><strong>Submissions:</strong> {displayUser._count.submissions}</div>
               )}

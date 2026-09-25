@@ -6,14 +6,23 @@ import ProblemDetail from './ProblemDetail';
 import Home from './Home';
 import Contests from './Contests';
 import ContestDetail from './ContestDetail';
+import ContestStandings from './ContestStandings';
 import Blogs from './Blogs';
+import BlogDetail from './BlogDetail';
+import BlogCreate from './BlogCreate';
+import BlogManage from './BlogManage';
+import Settings from './Settings';
 import LoginRegister from './LoginRegister';
 import Profile from './Profile';
 import AdminDashboard from './AdminDashboard';
 import AuthorDashboard from './AuthorDashboard';
 import Console from './Console';
+<<<<<<< Updated upstream
 import Ranking from './Rankings';
 import BlogsDash from './BlogsDashboard';
+=======
+import Rankings from './Rankings';
+>>>>>>> Stashed changes
 import { Container, Alert } from 'react-bootstrap';
 
 function NotFound() {
@@ -34,14 +43,23 @@ function App() {
           <Route path='/Problems/:id' element={<ProblemDetail/>}/>
           <Route path='/contests' element={<Contests/>}/>
           <Route path='/contests/:id' element={<ContestDetail/>}/>
+          <Route path='/contests/:id/standings' element={<ContestStandings/>}/>
           <Route path='/blogs' element={<Blogs/>}/>
+          <Route path='/blogs/:id' element={<BlogDetail/>}/>
+          <Route path='/blogs/create' element={<BlogCreate/>}/>
+          <Route path='/blogs/manage' element={<BlogManage/>}/>
           <Route path='/login' element={<LoginRegister/>}/>
           <Route path='/profile' element={<Profile/>}/>
+          <Route path='/settings' element={<Settings/>}/>
           <Route path='/admin' element={<AdminDashboard/>}/>
           <Route path='/author' element={<AuthorDashboard/>}/>
           <Route path='/console' element={<Console/>}/>
+<<<<<<< Updated upstream
           <Route path='/Rankings' element = {<Ranking/>}/> 
           <Route path='/BlogsDashboard' element = {<BlogsDash/>}/>
+=======
+          <Route path='/rankings' element={<Rankings/>}/>
+>>>>>>> Stashed changes
           <Route path='*' element={<NotFound />} />
          </Routes>
     </BrowserRouter>

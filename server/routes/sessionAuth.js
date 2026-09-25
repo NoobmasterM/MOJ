@@ -7,12 +7,16 @@ if (!JWT_SECRET && process.env.NODE_ENV === 'production') throw new Error('JWT_S
 const secret = JWT_SECRET || 'development-only-secret-change-me';
 const SESSION_DAYS = 7;
 
-export async function createSession(userId) {
+export async function createSession(userId, client = null) {
   const id = randomUUID();
   const expiresAt = new Date(Date.now() + SESSION_DAYS * 86400000);
-  await query('INSERT INTO auth_sessions (id, user_id, expires_at) VALUES ($1, $2, $3)', [id, userId, expiresAt]);
+  const execute = client ? client.query.bind(client) : query;
+  await execute('INSERT INTO auth_sessions (id, user_id, expires_at) VALUES ($1, $2, $3)', [id, userId, expiresAt]);
   return jwt.sign({ sub: String(userId), sid: id }, secret, { expiresIn: `${SESSION_DAYS}d` });
 }
 
 export const verifyToken = (token) => jwt.verify(token, secret);
-export const revokeSession = (id) => query('UPDATE auth_sessions SET revoked_at = NOW() WHERE id = $1 AND revoked_at IS NULL', [id]);
+export const revokeSession = (id, client = null) => {
+  const execute = client ? client.query.bind(client) : query;
+  return execute('UPDATE auth_sessions SET revoked_at = NOW() WHERE id = $1 AND revoked_at IS NULL', [id]);
+};

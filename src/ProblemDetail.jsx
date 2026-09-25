@@ -30,6 +30,7 @@ const getRatingFill = (problem) => {
 function ProblemDetail() {
   const { id } = useParams();
   const [problem, setProblem] = useState(null);
+  const [userSubmissions, setUserSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -39,6 +40,18 @@ function ProblemDetail() {
         setLoading(true);
         const data = await apiClient.getProblem(id);
         setProblem(data);
+
+        try {
+          const currentUser = await apiClient.getCurrentUser();
+          if (currentUser?.id) {
+            const submissions = await apiClient.getSubmissionsByProblem(data.id);
+            setUserSubmissions(submissions || []);
+          } else {
+            setUserSubmissions([]);
+          }
+        } catch {
+          setUserSubmissions([]);
+        }
       } catch (err) {
         setError(err.message);
         console.error("Failed to fetch problem:", err);
@@ -105,7 +118,12 @@ function ProblemDetail() {
                   <strong>Output:</strong>
                   <pre>{example.output}</pre>
                 </div>
-                
+                {example.explanation && (
+                  <div className="mb-3">
+                    <strong>Explanation:</strong>
+                    <p className="mb-0">{example.explanation}</p>
+                  </div>
+                )}
               </div>
             ))
           ) : (
@@ -134,6 +152,44 @@ function ProblemDetail() {
         </Col>
       </Row>
 
+      <Row className="mt-4">
+        <Col>
+          <h5>Submissions</h5>
+          {userSubmissions.length > 0 ? (
+            <table className="table table-sm table-striped">
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>Status</th>
+                  <th>Passed</th>
+                  <th>Language</th>
+                  <th>Execution Time</th>
+                  <th>Memory</th>
+                </tr>
+              </thead>
+              <tbody>
+                {userSubmissions.map((submission) => (
+                  <tr key={submission.id}>
+                    <td>{new Date(submission.createdAt).toLocaleString()}</td>
+                    <td>
+                      <Badge bg={submission.status === 'ACCEPTED' ? 'success' : submission.status === 'FAILED' ? 'danger' : 'secondary'}>
+                        {submission.status}
+                      </Badge>
+                    </td>
+                    <td>{submission.testsPassed ?? 0}/{submission.totalTests ?? 0}</td>
+                    <td>{submission.language}</td>
+                    <td>{submission.executionTime != null ? `${submission.executionTime} ms` : '—'}</td>
+                    <td>{submission.memoryUsed != null ? `${submission.memoryUsed} MB` : `${problem.memoryLimit ?? 0} MB`}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p className="text-muted">No submissions yet for this problem.</p>
+          )}
+        </Col>
+      </Row>
+
       <Row>
         <Col>
           <h5 style={{ display: "inline" }}>Ratings:</h5>
@@ -155,9 +211,9 @@ function ProblemDetail() {
             <>
               <h5 style={{ display: "inline" }}>Tags: </h5>
               {tags.map((tag, idx) => (
-                <Badge key={idx} pill bg="success" className="me-1">
-                  {tag}
-                </Badge>
+                <Badge key={idx} pill bg={tag==='DP' ? 'primary' : tag==='Graph' ? 'info' : tag==='Math' ? 'success' : tag==='Segment Tree' ? 'warning': tag==='Array'?'info':'danger'} className="me-1">
+                    {tag}
+              </Badge>
               ))}
               <br />
               <br />
