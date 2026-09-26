@@ -1,8 +1,6 @@
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
-<<<<<<< Updated upstream
-=======
 
 .notification-toggle {
   display: inline-flex !important;
@@ -31,4 +29,3 @@
 .notification-toggle::after {
   display: none;
 }
->>>>>>> Stashed changes

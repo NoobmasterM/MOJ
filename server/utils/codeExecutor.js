@@ -1,139 +1,150 @@
-import { exec } from 'child_process';
-import { promisify } from 'util';
+import { spawn } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import os from 'os';
 
-const execPromise = promisify(exec);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const tmpDir = os.tmpdir();
+const isWindows = os.platform() === 'win32';
 
 const LANGUAGES = {
   javascript: {
     ext: 'js',
     compile: null,
-    run: (filename) => `node "${filename}"`,
+    run: (filename) => ({ cmd: 'node', args: [filename] }),
     timeout: 5000
   },
   python: {
     ext: 'py',
     compile: null,
-    run: (filename) => `python "${filename}"`,
+    run: (filename) => ({ cmd: 'python', args: [filename] }),
     timeout: 5000
   },
   cpp: {
     ext: 'cpp',
-    compile: (filename) => `g++ "${filename}" -o "${filename.replace('.cpp', '')}"`,
-    run: (filename) => `"${filename.replace('.cpp', '')}"`,
+    compile: (filename) => {
+      const out = filename.replace('.cpp', isWindows ? '.exe' : '');
+      return { cmd: 'g++', args: [filename, '-o', out] };
+    },
+    run: (filename) => ({ cmd: filename.replace('.cpp', isWindows ? '.exe' : ''), args: [] }),
     timeout: 5000
   },
   c: {
     ext: 'c',
-    compile: (filename) => `gcc "${filename}" -o "${filename.replace('.c', '')}"`,
-    run: (filename) => `"${filename.replace('.c', '')}"`,
+    compile: (filename) => {
+      const out = filename.replace('.c', isWindows ? '.exe' : '');
+      return { cmd: 'gcc', args: [filename, '-o', out] };
+    },
+    run: (filename) => ({ cmd: filename.replace('.c', isWindows ? '.exe' : ''), args: [] }),
     timeout: 5000
   },
   java: {
     ext: 'java',
-    compile: (filename) => `javac "${filename}"`,
-    run: (filename) => `java -cp "${path.dirname(filename)}" ${path.basename(filename).replace('.java', '')}`,
+    compile: (filename) => ({ cmd: 'javac', args: [filename] }),
+    run: (filename) => {
+      const className = path.basename(filename, '.java');
+      return { cmd: 'java', args: ['-cp', path.dirname(filename), className] };
+    },
     timeout: 5000
   }
 };
 
 export async function executeCode(code, language = 'javascript', input = '') {
+  if (!LANGUAGES[language]) {
+    return { status: 'error', output: '', error: `Language "${language}" is not supported`, executionTime: 0 };
+  }
+
+  const langConfig = LANGUAGES[language];
+  const filename = path.join(tmpDir, `code_${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${langConfig.ext}`);
+  const baseExePath = filename.replace(`.${langConfig.ext}`, '');
+  const exePath = isWindows && (language === 'c' || language === 'cpp') ? `${baseExePath}.exe` : baseExePath;
+
+  const className = path.basename(filename, '.java');
+
+  if (language === 'java') {
+  // Regex to look for "class YourClassName" and dynamically swap it with the random file ID
+    code = code.replace(/(class\s+)[A-Za-z0-9_]+/g, `$1${className}`);
+  }
+
   try {
-    if (!LANGUAGES[language]) {
-      return {
-        status: 'error',
-        output: '',
-        error: `Language "${language}" is not supported`,
-        executionTime: 0
-      };
+    fs.writeFileSync(filename, code);
+    const startTime = Date.now();
+
+
+    if (langConfig.compile) {
+      const compSpec = langConfig.compile(filename);
+      const compilation = await new Promise((resolve) => {
+        const proc = spawn(compSpec.cmd, compSpec.args, { shell: true });
+        let stderr = '';
+        proc.stderr.on('data', (data) => { stderr += data.toString(); });
+        proc.on('close', (code) => resolve({ success: code === 0, error: stderr }));
+      });
+
+      if (!compilation.success) {
+        return {
+          status: 'error',
+          output: '',
+          error: `Compilation Error:\n${compilation.error}`,
+          executionTime: Date.now() - startTime
+        };
+      }
     }
 
-    const langConfig = LANGUAGES[language];
-    const filename = path.join(tmpDir, `code_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${langConfig.ext}`);
+
+    const runSpec = langConfig.run(filename);
+    const result = await new Promise((resolve) => {
+      const child = spawn(runSpec.cmd, runSpec.args, { shell: true });
+      let stdout = '';
+      let stderr = '';
+      let killedDueToTimeout = false;
+
+      const timer = setTimeout(() => {
+        killedDueToTimeout = true;
+        child.kill();
+      }, langConfig.timeout);
+
+      if (child.stdin) {
+        child.stdin.write(typeof input === 'string' ? input : String(input ?? ''));
+        child.stdin.end();
+      }
+
+      child.stdout.on('data', (data) => { stdout += data.toString(); });
+      child.stderr.on('data', (data) => { stderr += data.toString(); });
+
+      child.on('close', (code) => {
+        clearTimeout(timer);
+        if (killedDueToTimeout) {
+          resolve({ status: 'failed', output: '', error: 'Time Limit Exceeded' });
+        } else {
+          resolve({
+            status: (code === 0 && !stderr) ? 'accepted' : 'failed',
+            output: stdout.trim(),
+            error: stderr.trim() || null
+          });
+        }
+      });
+    });
+
+    return {
+      ...result,
+      executionTime: Date.now() - startTime
+    };
+
+  } catch (globalError) {
+    return { status: 'error', output: '', error: `Execution Error: ${globalError.message}`, executionTime: 0 };
+  } finally {
     
     try {
-      fs.writeFileSync(filename, code);
-      const startTime = Date.now();
-      let output = '';
-      let error = '';
-      let status = 'accepted';
-
-      if (langConfig.compile) {
-        try {
-          await execPromise(langConfig.compile(filename), { timeout: langConfig.timeout });
-        } catch (compileError) {
-          return {
-            status: 'error',
-            output: '',
-            error: `Compilation Error: ${compileError.message}`,
-            executionTime: Date.now() - startTime
-          };
-        }
+      if (fs.existsSync(filename)) fs.unlinkSync(filename);
+      if (fs.existsSync(exePath)) fs.unlinkSync(exePath);
+      if (language === 'java') {
+        const classFile = filename.replace('.java', '.class');
+        if (fs.existsSync(classFile)) fs.unlinkSync(classFile);
       }
-
-      try {
-        const runCommand = langConfig.run(filename);
-        // `exec` does not consume an `input` option. Write the editor input to
-        // the spawned process explicitly so programs using stdin can read it.
-        const execution = execPromise(runCommand, {
-          timeout: langConfig.timeout,
-          encoding: 'utf-8',
-          shell: true
-        });
-        execution.child.stdin.end(typeof input === 'string' ? input : String(input ?? ''));
-        const { stdout, stderr } = await execution;
-
-        output = stdout.trim();
-        if (stderr) {
-          error = stderr.trim();
-        }
-      } catch (runError) {
-        if (runError.killed) {
-          error = 'Time Limit Exceeded';
-          status = 'failed';
-        } else if (runError.signal) {
-          error = `Runtime Error: ${runError.message}`;
-          status = 'failed';
-        } else {
-          output = runError.stdout ? runError.stdout.trim() : '';
-          error = runError.stderr ? runError.stderr.trim() : runError.message;
-          status = 'failed';
-        }
-      }
-
-      const executionTime = Date.now() - startTime;
-
-      return {
-        status: error ? 'failed' : status,
-        output,
-        error: error || null,
-        executionTime
-      };
-    } finally {
-      try {
-        fs.unlinkSync(filename);
-        if (langConfig.compile) {
-          const exePath = filename.replace(`.${langConfig.ext}`, '');
-          if (fs.existsSync(exePath)) {
-            fs.unlinkSync(exePath);
-          }
-        }
-      } catch (cleanupError) {
-        console.error('Cleanup error:', cleanupError);
-      }
+    } catch (cleanupError) {
+      console.error('Cleanup warning:', cleanupError);
     }
-  } catch (error) {
-    return {
-      status: 'error',
-      output: '',
-      error: `Execution Error: ${error.message}`,
-      executionTime: 0
-    };
   }
 }
 

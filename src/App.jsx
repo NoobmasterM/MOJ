@@ -17,12 +17,7 @@ import Profile from './Profile';
 import AdminDashboard from './AdminDashboard';
 import AuthorDashboard from './AuthorDashboard';
 import Console from './Console';
-<<<<<<< Updated upstream
-import Ranking from './Rankings';
-import BlogsDash from './BlogsDashboard';
-=======
 import Rankings from './Rankings';
->>>>>>> Stashed changes
 import { Container, Alert } from 'react-bootstrap';
 
 function NotFound() {
@@ -54,12 +49,7 @@ function App() {
           <Route path='/admin' element={<AdminDashboard/>}/>
           <Route path='/author' element={<AuthorDashboard/>}/>
           <Route path='/console' element={<Console/>}/>
-<<<<<<< Updated upstream
-          <Route path='/Rankings' element = {<Ranking/>}/> 
-          <Route path='/BlogsDashboard' element = {<BlogsDash/>}/>
-=======
           <Route path='/rankings' element={<Rankings/>}/>
->>>>>>> Stashed changes
           <Route path='*' element={<NotFound />} />
          </Routes>
     </BrowserRouter>
